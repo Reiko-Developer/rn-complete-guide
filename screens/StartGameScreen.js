@@ -73,7 +73,7 @@ const StartGameScreen = props => {
             <View style={styles.screen}>
                 <BodyText style={styles.title} >Start a new Game</BodyText>
                 <Card style={styles.inputContainer} >
-                    <Text style={DefaultStyles.bodyText}>Select a Number:</Text>
+                    <BodyText >Select a Number:</BodyText>
                     <Input
                         style={styles.input}
                         blurOnSubmit autoCapitalize='none'
