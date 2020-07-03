@@ -1,54 +1,74 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Button, FlatList } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import * as Font from 'expo-font';
+import { AppLoading } from 'expo';
 
-import GoalItem from './components/GoalItem';
-import GoalInput from './components/GoalInput';
+import Header from './components/Header';
+import StartGameScreen from './screens/StartGameScreen';
+import GameScreen from './screens/GameScreen';
+import GameOverScreen from './screens/GameOverScreen';
+
+const fetchFonts = () => {
+  return Font.loadAsync({
+    'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
+    'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
+  });
+};
 
 export default function App() {
-  const [courseGoals, setCourseGoals] = useState([]);
-  const [isAddMode, setIsAddMode] = useState(false);
+  const [userNumber, setUserNumber] = useState();
+  const [guessRounds, setGuessRounds] = useState(0);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  const addGoalHandler = goalTitle => {
-    //This works but not in all the situations.
-    //setCourseGoals([...courseGoals], enteredGoal);
-
-    //this is the best practice, and workds in all situations!
-    setCourseGoals(currentGoals => [
-      ...currentGoals,
-      { id: Math.random().toString(), value: goalTitle },
-    ]);
-    setIsAddMode(false);
-  };
-
-  const removeGoalHandler = goalId => {
-    setCourseGoals(currentGoals => {
-      return currentGoals.filter(goal => goal.id !== goalId);
-    });
+  if (!dataLoaded) {
+    return (
+      <AppLoading
+        startAsync={fetchFonts}
+        onFinish={() => setDataLoaded(true)}
+        onError={(err) => console.log(err)}
+      />
+    );
   }
 
-  const cancelGoalAddHandler = () => {
-    setIsAddMode(false);
+  const configureNewGameHandler = () => {
+    setGuessRounds(0);
+    setUserNumber(null);
   };
+
+  const startGameHandler = selectedNumber => {
+    setUserNumber(selectedNumber);
+  };
+
+  const gameOverHandler = numOfRounds => {
+    setGuessRounds(numOfRounds);
+  };
+
+  let content = <StartGameScreen onStartGame={startGameHandler} />;
+
+  if (userNumber && guessRounds <= 0) {
+    content = (
+      <GameScreen userChoice={userNumber} onGameOver={gameOverHandler} />
+    );
+  } else if (guessRounds > 0) {
+    content = (
+      <GameOverScreen
+        roundsNumber={guessRounds}
+        userNumber={userNumber}
+        onRestart={configureNewGameHandler}
+      />
+    );
+  }
 
   return (
     <View style={styles.screen}>
-      <Button title="Add Goal" onPress={() => setIsAddMode(true)} />
-      <GoalInput visible={isAddMode} onAddGoal={addGoalHandler} onCancel={cancelGoalAddHandler} />
-      {/*by default the key extractor is looking for item.key, but u can change for id*/}
-      <FlatList
-        keyExtractor={(item, index) => item.id}
-        data={courseGoals}
-        renderItem={itemData => (
-          <GoalItem id={itemData.item.id} onDelete={removeGoalHandler} title={itemData.item.value}></GoalItem>
-        )}
-      />
+      <Header title="Guess a Number" />
+      {content}
     </View>
   );
 }
 
-//The best practice when working with styles is tu use the StyleSheet object!
 const styles = StyleSheet.create({
   screen: {
-    padding: 50,
-  },
+    flex: 1
+  }
 });
