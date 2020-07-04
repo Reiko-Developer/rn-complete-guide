@@ -7,19 +7,32 @@ import MainButton from '../components/MainButton';
 
 import Colors from '../constants/Colors';
 
+function printGuesses(guesses) {
+    let tmp = '  ';
+    guesses.forEach(element => {
+        tmp += element + '  '
+    });
+    return tmp;
+}
+
 const GameOverScreen = props => {
     return (
         <View style={styles.screen}>
             <BodyText style={styles.resultContainer}>The Game is over ;)</BodyText>
             <View style={styles.imageContainer}>
                 <Image
-                    fadeDuration={3000}
+                    fadeDuration={2000}
                     style={styles.image}
                     source={{ uri: 'https://www.coolgameassets.com/wp-content/uploads/edd/2018/03/featured-image-youwon.png' }}
                     resizeMode="cover"
                 />
             </View>
-            <BodyText style={styles.resultText}>Your fone needed <Text style={styles.highlight}>{props.roundsNumber}</Text> rounds to guess the number <Text style={styles.highlight}>{props.userNumber}</Text>.</BodyText>
+            <BodyText style={styles.resultText}>
+                Your fone needed <Text style={styles.highlight}>{props.guesses.length}</Text> rounds to guess the number <Text style={styles.highlight}>{props.userNumber}</Text>.
+
+            </BodyText>
+            <BodyText>Guesses log:{printGuesses(props.guesses)}
+            </BodyText>
             <MainButton onPress={props.onRestart}>
                 NEW GAME
             </MainButton>
